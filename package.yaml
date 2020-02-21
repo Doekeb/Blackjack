@@ -21,12 +21,13 @@ description:         Please see the README on GitHub at <https://github.com/Doek
 
 dependencies:
 - base >= 4.7 && < 5
+- random
 
 library:
   source-dirs: src
 
 executables:
-  Blackjack-exe:
+  Blackjack:
     main:                Main.hs
     source-dirs:         app
     ghc-options:
