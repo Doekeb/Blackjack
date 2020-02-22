@@ -48,12 +48,14 @@ gameLoop d0 w0 = do
   (playerEnd, d3)   <- playerTurn playerStart d2 -- Do the player's turn
   putStrLn "" -- I just want a new line after the player's turn is over.
   (result, d4)      <- -- Only do the dealer's turn if the player isn't bust.
-    case handValue playerEnd of
-      0          -> do
+    case (handValue playerEnd, length playerEnd) of
+      (0, _)          -> do
         return (PlayerSurrender, d3)
-      x | x > 21 -> do
-        return (PlayerBust, d3)
-      _          -> do
+      (x, _) | x > 21  -> do
+               return (PlayerBust, d3)
+             | x == 21 -> do
+               return (PlayerBlackjack, d3)
+      _               -> do
         (dealerEnd, d4) <- dealerTurn dealerStart d3
         putStrLn $ "The dealer reveals the hand " ++ prettyPrint dealerEnd ++ "."
         let result
@@ -77,12 +79,17 @@ gameLoop d0 w0 = do
             | wager `mod` 2 == 1 = " You tip the dealer $1."
             | otherwise          = ""
       putStrLn $ "You've surrendered." ++ tipDealer
-      gameLoop d4 (w0 - (wager - (wager `div` 2)))
+      gameLoop d4 (w0 - ((wager+1) `div` 2))
     PlayerBust      -> do
       putStrLn $ "You bust! Your hand is "
                ++ prettyPrint playerEnd
                ++ ". The house wins.\n"
       gameLoop d4 (w0-wager)
+    PlayerBlackjack -> do
+      putStrLn $ "Blackjack! Your hand is "
+               ++ prettyPrint playerEnd
+               ++ ". You win!\n"
+      gameLoop d4 (w0 + ((wager+1) `div` 2))
     DealerBust      -> do
       putStrLn "Dealer busts! You win!\n"
       gameLoop d4 (w0+wager)

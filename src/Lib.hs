@@ -127,8 +127,10 @@ safeReadMove b x
 
 playerTurn :: Hand -> Deck -> IO (Hand, Deck)
 playerTurn h d = do
-  case compare (handValue h) 21 of
-    GT -> do
+  case (compare (handValue h) 21, length h) of
+    (GT, _) -> do
+      return (h, d)
+    (EQ, 2) -> do
       return (h, d)
     _ -> do
       let surrAvailable = length h == 2
@@ -165,7 +167,7 @@ dealerTurn h d = do
 
 -- some other useful stuff
 
-data Result = PlayerBust | DealerBust | PlayerWin | DealerWin | Push | PlayerSurrender
+data Result = PlayerBust | PlayerBlackjack | DealerBust | PlayerWin | DealerWin | Push | PlayerSurrender
   deriving (Show, Eq)
 
 
